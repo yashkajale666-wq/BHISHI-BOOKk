@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>भिशी बुक (Bhishi Book)</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { margin: 0; background-color: #f4f7f6; color: #333; }
+        header { background: #007bff; color: white; padding: 15px; text-align: center; font-size: 22px; font-weight: bold; }
+        .container { padding: 15px; max-width: 600px; margin: auto; }
+        .card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, button { width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
+        button { background: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; }
+        button:hover { background: #218838; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #007bff; color: white; }
+        .delete-btn { background: #dc3545; padding: 5px 10px; font-size: 12px; width: auto; }
+        .summary { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <header>📚 माझी भिशी बुक</header>
+
+    <div class="container">
+        <!-- डॅशबोर्ड -->
+        <div class="card">
+            <div class="summary">एकूण सदस्य: <span id="totalMembers">0</span></div>
+            <div class="summary">जमलेला एकूण निधी: ₹<span id="totalFund">0</span></div>
+        </div>
+
+        <!-- सदस्य जोडण्याचा फॉर्म -->
+        <div class="card">
+            <h3>नवीन सदस्य जोडा</h3>
+            <input type="text" id="memberName" placeholder="सदस्याचे नाव">
+            <input type="number" id="monthlyAmt" placeholder="मासिक हप्ता (₹)">
+            <button onclick="addMember()">सदस्य समाविष्ट करा</button>
+        </div>
+
+        <!-- सदस्यांची यादी -->
+        <div class="card">
+            <h3>भिशी सदस्य यादी</h3>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>नाव</th>
+                            <th>हप्ता (₹)</th>
+                            <th>कृती</th>
+                        </tr>
+                    </thead>
+                    <tbody id="memberTableBody">
+                        <!-- डेटा इथे जावास्क्रिप्ट द्वारे येईल -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let members = JSON.parse(localStorage.getItem('bhishiMembers')) || [];
+
+        function saveData() {
+            localStorage.setItem('bhishiMembers', JSON.stringify(members));
+            render();
+        }
+
+        function addMember() {
+            let name = document.getElementById('memberName').value.trim();
+            let amt = document.getElementById('monthlyAmt').value;
+
+            if (name === '' || amt === '') {
+                alert('कृपया सर्व माहिती भरा!');
+                return;
+            }
+
+            members.push({ name: name, amount: parseFloat(amt) });
+            document.getElementById('memberName').value = '';
+            document.getElementById('monthlyAmt').value = '';
+            saveData();
+        }
+
+        function deleteMember(index) {
+            members.splice(index, 1);
+            saveData();
+        }
+
+        function render() {
+            let tableBody = document.getElementById('memberTableBody');
+            tableBody.innerHTML = '';
+            let totalFund = 0;
+
+            members.forEach((m, index) => {
+                totalFund += m.amount;
+                let row = `<tr>
+                    <td>${m.name}</td>
+                    <td>₹${m.amount}</td>
+                    <td><button class="delete-btn" onclick="deleteMember(${index})">काढून टाका</button></td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+
+            document.getElementById('totalMembers').innerText = members.length;
+            document.getElementById('totalFund').innerText = totalFund;
+        }
+
+        render();
+    </script>
+</body>
+</html>
