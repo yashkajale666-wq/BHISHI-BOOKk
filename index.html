@@ -3,28 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>भिशी बुक (Bhishi Book)</title>
+    <title>भिशी बुक - डिजिटल डायरी</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-slate-100 font-sans">
+<body class="bg-slate-100 font-sans pb-10">
 
     <!-- Header -->
-    <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-50">
+    <header class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white p-4 shadow-lg sticky top-0 z-50">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold flex items-center gap-2">
-                <i class="fa-solid fa-book-open"></i> भिशी बुक (Bhishi Book)
+                <i class="fa-solid fa-vault"></i> भिशी बुक प्रो
             </h1>
-            <span id="totalPool" class="bg-indigo-700 px-3 py-1 rounded-full text-sm font-semibold">एकूण पूल: ₹0</span>
+            <div class="text-right">
+                <p class="text-xs text-emerald-200">एकूण जमा फंड</p>
+                <span id="grandTotalPool" class="text-lg font-extrabold">₹0</span>
+            </div>
         </div>
     </header>
 
     <main class="max-w-4xl mx-auto p-4 space-y-6">
 
+        <!-- Settings Card -->
+        <div class="bg-white p-4 rounded-xl shadow border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <h2 class="font-bold text-slate-800">भिशी सेटिंग</h2>
+                <p class="text-xs text-slate-500">प्रत्येक सदस्याची मासिक हप्ता रक्कम सेट करा</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-slate-600">हप्ता रक्कम (₹):</span>
+                <input type="number" id="installmentAmount" value="1000" onchange="updateSettings()" class="border p-2 rounded-lg w-28 font-bold text-emerald-600 outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+        </div>
+
         <!-- Tab Navigation -->
         <div class="flex bg-white rounded-xl shadow p-1 border border-slate-200">
-            <button onclick="switchTab('members')" id="tab-members" class="flex-1 py-2 rounded-lg font-medium text-sm transition bg-indigo-600 text-white">सदस्य (Members)</button>
-            <button onclick="switchTab('tracker')" id="tab-tracker" class="flex-1 py-2 rounded-lg font-medium text-sm transition text-slate-600">हप्ता ट्रॅकर (Tracker)</button>
+            <button onclick="switchTab('members')" id="tab-members" class="flex-1 py-2 rounded-lg font-semibold text-sm transition bg-emerald-600 text-white">सदस्य</button>
+            <button onclick="switchTab('tracker')" id="tab-tracker" class="flex-1 py-2 rounded-lg font-semibold text-sm transition text-slate-600">हप्ता व मानकरी</button>
         </div>
 
         <!-- Section 1: Members Management -->
@@ -32,25 +47,26 @@
             <div class="bg-white p-4 rounded-xl shadow border border-slate-200">
                 <h2 class="text-lg font-bold text-slate-800 mb-3">नवीन सदस्य जोडा</h2>
                 <form id="memberForm" onsubmit="addMember(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <input type="text" id="memberName" placeholder="सदस्याचे नाव" required class="border p-2 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <input type="tel" id="memberPhone" placeholder="मोबाईल नंबर" class="border p-2 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">सदस्य जोडा</button>
+                    <input type="text" id="memberName" placeholder="सदस्याचे पूर्ण नाव" required class="border p-2 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <input type="tel" id="memberPhone" placeholder="मोबाईल नंबर" class="border p-2 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg transition shadow">सदस्य समाविष्ट करा</button>
                 </form>
             </div>
 
             <div class="bg-white p-4 rounded-xl shadow border border-slate-200">
-                <h2 class="text-lg font-bold text-slate-800 mb-3">सदस्यांची यादी</h2>
+                <h2 class="text-lg font-bold text-slate-800 mb-3">सदस्यांची यादी (<span id="memberCount">0</span>)</h2>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50 border-b text-slate-600 text-sm">
-                                <th class="p-3">नांव</th>
+                                <th class="p-3">अ.क्र.</th>
+                                <th class="p-3">नाव</th>
                                 <th class="p-3">मोबाईल</th>
                                 <th class="p-3 text-center">कृती</th>
                             </tr>
                         </thead>
                         <tbody id="memberTableBody" class="divide-y text-sm text-slate-700">
-                            <!-- JS Dynamically Fills -->
+                            <!-- JS Fills -->
                         </tbody>
                     </table>
                 </div>
@@ -59,9 +75,9 @@
 
         <!-- Section 2: Tracker -->
         <section id="section-tracker" class="space-y-4 hidden">
-            <div class="bg-white p-4 rounded-xl shadow border border-slate-200 flex justify-between items-center">
+            <div class="bg-white p-4 rounded-xl shadow border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <h2 class="text-lg font-bold text-slate-800">महिना निवडा</h2>
-                <select id="monthSelect" onchange="renderTracker()" class="border p-2 rounded-lg font-medium text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500">
+                <select id="monthSelect" onchange="renderTracker()" class="border p-2 rounded-lg font-medium text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 w-full sm:w-48">
                     <option value="महिना १">महिना १</option>
                     <option value="महिना २">महिना २</option>
                     <option value="महिना ३">महिना ३</option>
@@ -77,18 +93,30 @@
                 </select>
             </div>
 
+            <!-- Month Summary Card -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-center shadow-sm">
+                    <p class="text-xs text-emerald-700 font-medium">या महिन्याचे कलेक्शन</p>
+                    <h3 id="monthCollection" class="text-xl font-bold text-emerald-800">₹0</h3>
+                </div>
+                <div class="bg-teal-50 border border-teal-200 p-4 rounded-xl text-center shadow-sm">
+                    <p class="text-xs text-teal-700 font-medium">भरलेले सदस्य</p>
+                    <h3 id="paidCount" class="text-xl font-bold text-teal-800">0 / 0</h3>
+                </div>
+            </div>
+
             <div class="bg-white p-4 rounded-xl shadow border border-slate-200">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50 border-b text-slate-600 text-sm">
-                                <th class="p-3">सदस्य</th>
-                                <th class="p-3 text-center">हप्ता स्थिती</th>
-                                <th class="p-3 text-center">मानकरी (Winner)</th>
+                                <th class="p-3">सदस्य नाव</th>
+                                <th class="p-3 text-center">हप्ता भरला? (Paid)</th>
+                                <th class="p-3 text-center">या महिन्याचा मानकरी (Winner)</th>
                             </tr>
                         </thead>
                         <tbody id="trackerTableBody" class="divide-y text-sm text-slate-700">
-                            <!-- JS Dynamically Fills -->
+                            <!-- JS Fills -->
                         </tbody>
                     </table>
                 </div>
@@ -99,35 +127,45 @@
 
     <!-- JavaScript Logic -->
     <script>
-        let members = JSON.parse(localStorage.getItem('bhishi_members')) || [];
-        let records = JSON.parse(localStorage.getItem('bhishi_records')) || {};
+        let members = JSON.parse(localStorage.getItem('bhishi_members_v2')) || [];
+        let records = JSON.parse(localStorage.getItem('bhishi_records_v2')) || {};
+        let installment = localStorage.getItem('bhishi_installment') || 1000;
+
+        document.getElementById('installmentAmount').value = installment;
+
+        function updateSettings() {
+            installment = parseFloat(document.getElementById('installmentAmount').value) || 0;
+            localStorage.setItem('bhishi_installment', installment);
+            calculateTotals();
+        }
 
         function saveData() {
-            localStorage.setItem('bhishi_members', JSON.stringify(members));
-            localStorage.setItem('bhishi_records', JSON.stringify(records));
-            updateTotalPool();
+            localStorage.setItem('bhishi_members_v2', JSON.stringify(members));
+            localStorage.setItem('bhishi_records_v2', JSON.stringify(records));
+            calculateTotals();
         }
 
         function switchTab(tab) {
             document.getElementById('section-members').classList.add('hidden');
             document.getElementById('section-tracker').classList.add('hidden');
-            document.getElementById('tab-members').className = 'flex-1 py-2 rounded-lg font-medium text-sm transition text-slate-600';
-            document.getElementById('tab-tracker').className = 'flex-1 py-2 rounded-lg font-medium text-sm transition text-slate-600';
+            document.getElementById('tab-members').className = 'flex-1 py-2 rounded-lg font-semibold text-sm transition text-slate-600';
+            document.getElementById('tab-tracker').className = 'flex-1 py-2 rounded-lg font-semibold text-sm transition text-slate-600';
 
             if(tab === 'members') {
                 document.getElementById('section-members').classList.remove('hidden');
-                document.getElementById('tab-members').className = 'flex-1 py-2 rounded-lg font-medium text-sm transition bg-indigo-600 text-white';
+                document.getElementById('tab-members').className = 'flex-1 py-2 rounded-lg font-semibold text-sm transition bg-emerald-600 text-white';
+                renderMembers();
             } else {
                 document.getElementById('section-tracker').classList.remove('hidden');
-                document.getElementById('tab-tracker').className = 'flex-1 py-2 rounded-lg font-medium text-sm transition bg-indigo-600 text-white';
+                document.getElementById('tab-tracker').className = 'flex-1 py-2 rounded-lg font-semibold text-sm transition bg-emerald-600 text-white';
                 renderTracker();
             }
         }
 
         function addMember(e) {
             e.preventDefault();
-            const name = document.getElementById('memberName').value;
-            const phone = document.getElementById('memberPhone').value;
+            const name = document.getElementById('memberName').value.trim();
+            const phone = document.getElementById('memberPhone').value.trim();
             
             members.push({ id: Date.now(), name, phone });
             document.getElementById('memberForm').reset();
@@ -136,25 +174,30 @@
         }
 
         function deleteMember(id) {
-            members = members.filter(m => m.id !== id);
-            saveData();
-            renderMembers();
+            if(confirm('हा सदस्य डिलीट करायचा का?')) {
+                members = members.filter(m => m.id !== id);
+                saveData();
+                renderMembers();
+            }
         }
 
         function renderMembers() {
             const tbody = document.getElementById('memberTableBody');
+            document.getElementById('memberCount').innerText = members.length;
             tbody.innerHTML = '';
+            
             if(members.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400">कोणतीही नोंद नाही.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400">कोणतीही सदस्याची नोंद नाही. वर फॉर्ममधून नाव टाका.</td></tr>`;
                 return;
             }
-            members.forEach(m => {
+            members.forEach((m, index) => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-medium">${m.name}</td>
-                        <td class="p-3 text-slate-500">${m.phone || '-'}</td>
+                        <td class="p-3 text-slate-500 font-medium">${index + 1}</td>
+                        <td class="p-3 font-semibold text-slate-800">${m.name}</td>
+                        <td class="p-3 text-slate-600">${m.phone || '-'}</td>
                         <td class="p-3 text-center">
-                            <button onclick="deleteMember(${m.id})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="deleteMember(${m.id})" class="text-red-500 hover:text-red-700 bg-red-50 p-2 rounded-lg transition"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
@@ -171,54 +214,68 @@
             }
 
             if(members.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400">आधी सदस्य जोडा.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-slate-400">आधी 'सदस्य' टॅबमध्ये जाऊन मेंबर्स जोडा.</td></tr>`;
+                document.getElementById('monthCollection').innerText = '₹0';
+                document.getElementById('paidCount').innerText = '0 / 0';
                 return;
             }
+
+            let paidCount = 0;
 
             members.forEach(m => {
                 if(!records[month][m.id]) {
                     records[month][m.id] = { paid: false, winner: false };
                 }
                 const data = records[month][m.id];
+                if(data.paid) paidCount++;
+
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-medium">${m.name}</td>
+                        <td class="p-3 font-semibold text-slate-800">${m.name}</td>
                         <td class="p-3 text-center">
-                            <input type="checkbox" ${data.paid ? 'checked' : ''} onchange="togglePaid('${month}', ${m.id})" class="w-5 h-5 accent-indigo-600 cursor-pointer">
+                            <input type="checkbox" ${data.paid ? 'checked' : ''} onchange="togglePaid('${month}', ${m.id})" class="w-6 h-6 accent-emerald-600 cursor-pointer rounded">
                         </td>
                         <td class="p-3 text-center">
-                            <input type="checkbox" ${data.winner ? 'checked' : ''} onchange="toggleWinner('${month}', ${m.id})" class="w-5 h-5 accent-emerald-600 cursor-pointer">
+                            <input type="checkbox" ${data.winner ? 'checked' : ''} onchange="toggleWinner('${month}', ${m.id})" class="w-6 h-6 accent-amber-600 cursor-pointer rounded">
                         </td>
                     </tr>
                 `;
             });
+
+            let currentMonthCollection = paidCount * installment;
+            document.getElementById('monthCollection').innerText = `₹${currentMonthCollection.toLocaleString('en-IN')}`;
+            document.getElementById('paidCount').innerText = `${paidCount} / ${members.length}`;
+            calculateTotals();
         }
 
         function togglePaid(month, memberId) {
             records[month][memberId].paid = !records[month][memberId].paid;
             saveData();
+            renderTracker();
         }
 
         function toggleWinner(month, memberId) {
-            // एका महिन्यात एकच मानकरी किंवा एकाधिक हवे असल्यास हे सिम्पल ठेवले आहे
+            // एका महिन्यात एकापेक्षा जास्त मानकरी हवे असल्यास किंवा बदल करायचा असल्यास
             records[month][memberId].winner = !records[month][memberId].winner;
             saveData();
         }
 
-        function updateTotalPool() {
-            let totalPaidCount = 0;
+        function calculateTotals() {
+            let totalPaid = 0;
             for(let month in records) {
                 for(let memberId in records[month]) {
-                    if(records[month][memberId].paid) totalPaidCount++;
+                    if(records[month][memberId].paid) {
+                        totalPaid++;
+                    }
                 }
             }
-            // समजा एका हप्त्याची रक्कम उदा. 1000 गृहीत धरली आहे, ती बदलू शकता
-            document.getElementById('totalPool').innerText = `एकूण भरलेले हप्ते: ${totalPaidCount}`;
+            let grandTotal = totalPaid * installment;
+            document.getElementById('grandTotalPool').innerText = `₹${grandTotal.toLocaleString('en-IN')}`;
         }
 
         // Initial Load
         renderMembers();
-        updateTotalPool();
+        calculateTotals();
     </script>
 </body>
 </html>
