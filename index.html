@@ -4,109 +4,221 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>भिशी बुक (Bhishi Book)</title>
-    <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { margin: 0; background-color: #f4f7f6; color: #333; }
-        header { background: #007bff; color: white; padding: 15px; text-align: center; font-size: 22px; font-weight: bold; }
-        .container { padding: 15px; max-width: 600px; margin: auto; }
-        .card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        input, button { width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
-        button { background: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; }
-        button:hover { background: #218838; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #007bff; color: white; }
-        .delete-btn { background: #dc3545; padding: 5px 10px; font-size: 12px; width: auto; }
-        .summary { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 5px; }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-slate-100 font-sans">
 
-    <header>📚 माझी भिशी बुक</header>
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-book-open"></i> भिशी बुक (Bhishi Book)
+            </h1>
+            <span id="totalPool" class="bg-indigo-700 px-3 py-1 rounded-full text-sm font-semibold">एकूण पूल: ₹0</span>
+        </div>
+    </header>
 
-    <div class="container">
-        <!-- डॅशबोर्ड -->
-        <div class="card">
-            <div class="summary">एकूण सदस्य: <span id="totalMembers">0</span></div>
-            <div class="summary">जमलेला एकूण निधी: ₹<span id="totalFund">0</span></div>
+    <main class="max-w-4xl mx-auto p-4 space-y-6">
+
+        <!-- Tab Navigation -->
+        <div class="flex bg-white rounded-xl shadow p-1 border border-slate-200">
+            <button onclick="switchTab('members')" id="tab-members" class="flex-1 py-2 rounded-lg font-medium text-sm transition bg-indigo-600 text-white">सदस्य (Members)</button>
+            <button onclick="switchTab('tracker')" id="tab-tracker" class="flex-1 py-2 rounded-lg font-medium text-sm transition text-slate-600">हप्ता ट्रॅकर (Tracker)</button>
         </div>
 
-        <!-- सदस्य जोडण्याचा फॉर्म -->
-        <div class="card">
-            <h3>नवीन सदस्य जोडा</h3>
-            <input type="text" id="memberName" placeholder="सदस्याचे नाव">
-            <input type="number" id="monthlyAmt" placeholder="मासिक हप्ता (₹)">
-            <button onclick="addMember()">सदस्य समाविष्ट करा</button>
-        </div>
-
-        <!-- सदस्यांची यादी -->
-        <div class="card">
-            <h3>भिशी सदस्य यादी</h3>
-            <div style="overflow-x:auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>नाव</th>
-                            <th>हप्ता (₹)</th>
-                            <th>कृती</th>
-                        </tr>
-                    </thead>
-                    <tbody id="memberTableBody">
-                        <!-- डेटा इथे जावास्क्रिप्ट द्वारे येईल -->
-                    </tbody>
-                </table>
+        <!-- Section 1: Members Management -->
+        <section id="section-members" class="space-y-4">
+            <div class="bg-white p-4 rounded-xl shadow border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800 mb-3">नवीन सदस्य जोडा</h2>
+                <form id="memberForm" onsubmit="addMember(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <input type="text" id="memberName" placeholder="सदस्याचे नाव" required class="border p-2 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <input type="tel" id="memberPhone" placeholder="मोबाईल नंबर" class="border p-2 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">सदस्य जोडा</button>
+                </form>
             </div>
-        </div>
-    </div>
 
+            <div class="bg-white p-4 rounded-xl shadow border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800 mb-3">सदस्यांची यादी</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b text-slate-600 text-sm">
+                                <th class="p-3">नांव</th>
+                                <th class="p-3">मोबाईल</th>
+                                <th class="p-3 text-center">कृती</th>
+                            </tr>
+                        </thead>
+                        <tbody id="memberTableBody" class="divide-y text-sm text-slate-700">
+                            <!-- JS Dynamically Fills -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Tracker -->
+        <section id="section-tracker" class="space-y-4 hidden">
+            <div class="bg-white p-4 rounded-xl shadow border border-slate-200 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-slate-800">महिना निवडा</h2>
+                <select id="monthSelect" onchange="renderTracker()" class="border p-2 rounded-lg font-medium text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="महिना १">महिना १</option>
+                    <option value="महिना २">महिना २</option>
+                    <option value="महिना ३">महिना ३</option>
+                    <option value="महिना ४">महिना ४</option>
+                    <option value="महिना ५">महिना ५</option>
+                    <option value="महिना ६">महिना ६</option>
+                    <option value="महिना ७">महिना ७</option>
+                    <option value="महिना ८">महिना ८</option>
+                    <option value="महिना ९">महिना ९</option>
+                    <option value="महिना १०">महिना १०</option>
+                    <option value="महिना ११">महिना ११</option>
+                    <option value="महिना १२">महिना १२</option>
+                </select>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow border border-slate-200">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b text-slate-600 text-sm">
+                                <th class="p-3">सदस्य</th>
+                                <th class="p-3 text-center">हप्ता स्थिती</th>
+                                <th class="p-3 text-center">मानकरी (Winner)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trackerTableBody" class="divide-y text-sm text-slate-700">
+                            <!-- JS Dynamically Fills -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript Logic -->
     <script>
-        let members = JSON.parse(localStorage.getItem('bhishiMembers')) || [];
+        let members = JSON.parse(localStorage.getItem('bhishi_members')) || [];
+        let records = JSON.parse(localStorage.getItem('bhishi_records')) || {};
 
         function saveData() {
-            localStorage.setItem('bhishiMembers', JSON.stringify(members));
-            render();
+            localStorage.setItem('bhishi_members', JSON.stringify(members));
+            localStorage.setItem('bhishi_records', JSON.stringify(records));
+            updateTotalPool();
         }
 
-        function addMember() {
-            let name = document.getElementById('memberName').value.trim();
-            let amt = document.getElementById('monthlyAmt').value;
+        function switchTab(tab) {
+            document.getElementById('section-members').classList.add('hidden');
+            document.getElementById('section-tracker').classList.add('hidden');
+            document.getElementById('tab-members').className = 'flex-1 py-2 rounded-lg font-medium text-sm transition text-slate-600';
+            document.getElementById('tab-tracker').className = 'flex-1 py-2 rounded-lg font-medium text-sm transition text-slate-600';
 
-            if (name === '' || amt === '') {
-                alert('कृपया सर्व माहिती भरा!');
+            if(tab === 'members') {
+                document.getElementById('section-members').classList.remove('hidden');
+                document.getElementById('tab-members').className = 'flex-1 py-2 rounded-lg font-medium text-sm transition bg-indigo-600 text-white';
+            } else {
+                document.getElementById('section-tracker').classList.remove('hidden');
+                document.getElementById('tab-tracker').className = 'flex-1 py-2 rounded-lg font-medium text-sm transition bg-indigo-600 text-white';
+                renderTracker();
+            }
+        }
+
+        function addMember(e) {
+            e.preventDefault();
+            const name = document.getElementById('memberName').value;
+            const phone = document.getElementById('memberPhone').value;
+            
+            members.push({ id: Date.now(), name, phone });
+            document.getElementById('memberForm').reset();
+            saveData();
+            renderMembers();
+        }
+
+        function deleteMember(id) {
+            members = members.filter(m => m.id !== id);
+            saveData();
+            renderMembers();
+        }
+
+        function renderMembers() {
+            const tbody = document.getElementById('memberTableBody');
+            tbody.innerHTML = '';
+            if(members.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400">कोणतीही नोंद नाही.</td></tr>`;
+                return;
+            }
+            members.forEach(m => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-medium">${m.name}</td>
+                        <td class="p-3 text-slate-500">${m.phone || '-'}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteMember(${m.id})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderTracker() {
+            const month = document.getElementById('monthSelect').value;
+            const tbody = document.getElementById('trackerTableBody');
+            tbody.innerHTML = '';
+
+            if(!records[month]) {
+                records[month] = {};
+            }
+
+            if(members.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400">आधी सदस्य जोडा.</td></tr>`;
                 return;
             }
 
-            members.push({ name: name, amount: parseFloat(amt) });
-            document.getElementById('memberName').value = '';
-            document.getElementById('monthlyAmt').value = '';
-            saveData();
-        }
-
-        function deleteMember(index) {
-            members.splice(index, 1);
-            saveData();
-        }
-
-        function render() {
-            let tableBody = document.getElementById('memberTableBody');
-            tableBody.innerHTML = '';
-            let totalFund = 0;
-
-            members.forEach((m, index) => {
-                totalFund += m.amount;
-                let row = `<tr>
-                    <td>${m.name}</td>
-                    <td>₹${m.amount}</td>
-                    <td><button class="delete-btn" onclick="deleteMember(${index})">काढून टाका</button></td>
-                </tr>`;
-                tableBody.innerHTML += row;
+            members.forEach(m => {
+                if(!records[month][m.id]) {
+                    records[month][m.id] = { paid: false, winner: false };
+                }
+                const data = records[month][m.id];
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-medium">${m.name}</td>
+                        <td class="p-3 text-center">
+                            <input type="checkbox" ${data.paid ? 'checked' : ''} onchange="togglePaid('${month}', ${m.id})" class="w-5 h-5 accent-indigo-600 cursor-pointer">
+                        </td>
+                        <td class="p-3 text-center">
+                            <input type="checkbox" ${data.winner ? 'checked' : ''} onchange="toggleWinner('${month}', ${m.id})" class="w-5 h-5 accent-emerald-600 cursor-pointer">
+                        </td>
+                    </tr>
+                `;
             });
-
-            document.getElementById('totalMembers').innerText = members.length;
-            document.getElementById('totalFund').innerText = totalFund;
         }
 
-        render();
+        function togglePaid(month, memberId) {
+            records[month][memberId].paid = !records[month][memberId].paid;
+            saveData();
+        }
+
+        function toggleWinner(month, memberId) {
+            // एका महिन्यात एकच मानकरी किंवा एकाधिक हवे असल्यास हे सिम्पल ठेवले आहे
+            records[month][memberId].winner = !records[month][memberId].winner;
+            saveData();
+        }
+
+        function updateTotalPool() {
+            let totalPaidCount = 0;
+            for(let month in records) {
+                for(let memberId in records[month]) {
+                    if(records[month][memberId].paid) totalPaidCount++;
+                }
+            }
+            // समजा एका हप्त्याची रक्कम उदा. 1000 गृहीत धरली आहे, ती बदलू शकता
+            document.getElementById('totalPool').innerText = `एकूण भरलेले हप्ते: ${totalPaidCount}`;
+        }
+
+        // Initial Load
+        renderMembers();
+        updateTotalPool();
     </script>
 </body>
 </html>
